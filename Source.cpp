@@ -6,19 +6,19 @@ void free_session(ssh_session session) {
     ssh_disconnect(session);
     ssh_free(session);
 }
-
+//Обработчик ошибок
 void error(ssh_session session) {
     fprintf(stderr, "Error: %s\n", ssh_get_error(session));
     free_session(session);
     exit(-1);
 }
-
+//Закрытие соединения
 void close_channel(ssh_channel channel) {
     ssh_channel_send_eof(channel);
     ssh_channel_close(channel);
     ssh_channel_free(channel);
 }
-
+//Выполнение команды в bash
 void execute_command(const char* command, ssh_channel channel, ssh_session session) {
     unsigned int nbytes;
     int rc;
@@ -50,19 +50,19 @@ int main() {
     printf("Session...\n");
     session = ssh_new();
     if (session == NULL) exit(-1);
-
+    //Настройка сессии
     ssh_options_set(session, SSH_OPTIONS_HOST, "192.168.1.10");
     ssh_options_set(session, SSH_OPTIONS_PORT, &port);
     ssh_options_set(session, SSH_OPTIONS_USER, "tom");
-
+    //Подключение
     printf("Connecting...\n");
     rc = ssh_connect(session);
     if (rc != SSH_OK) error(session);
-
+    //Аутентификация
     printf("Password Autentication...\n");
     rc = ssh_userauth_password(session, NULL, "tom");
     if (rc != SSH_AUTH_SUCCESS) error(session);
-
+    //Вывод данных
     printf("Server information\n\n");
     printf("hostname: ");
     execute_command("hostname", channel, session);
